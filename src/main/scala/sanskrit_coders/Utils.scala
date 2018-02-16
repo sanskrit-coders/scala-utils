@@ -76,7 +76,7 @@ object RichHttpClient {
     * @param client
     * @param ec
     * @param materializer
-    * @return a function of the type HttpClient
+    * @return a recursive function of the type HttpClient
     */
   def httpClientWithRedirect(client: HttpClient)(implicit ec: ExecutionContext, materializer: Materializer): HttpClient = {
     // We are defining a function below!
