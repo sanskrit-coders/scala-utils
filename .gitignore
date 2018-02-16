@@ -1,0 +1,23 @@
+*.class
+*.log
+
+server_config_local.json
+
+# sbt specific
+.cache
+.history
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+.idea
+.idea_modules
+*.iws
+*.ipr
