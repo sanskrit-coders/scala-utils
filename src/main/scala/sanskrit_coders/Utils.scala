@@ -7,19 +7,50 @@ import akka.stream.Materializer
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
+//noinspection ScalaDocMissingParameterDescription
 object Utils {
+  /**
+    * Map  Seq[Future[T]] to Seq[Future[Try[T]]]
+    *
+    * @param futures
+    * @param ec
+    * @tparam T
+    * @return
+    */
   def mapValuesToTrys[T](futures: Seq[Future[T]])(implicit ec: ExecutionContext): Seq[Future[Try[T]]] =
     futures.map(_.map { Success(_) }.recover { case t => Failure(t) })
+
+  /**
+    * Map Seq[Future[T]] to Future[Seq[Try[T]]]
+    *
+    * @param futures
+    * @param ec
+    * @tparam T
+    * @return
+    */
   def getFutureOfTrys[T](futures: Seq[Future[T]])(implicit ec: ExecutionContext): Future[Seq[Try[T]]] =
     Future.sequence(mapValuesToTrys(futures = futures))
 
 }
 
-// We need a client robust to redirects and such.
-// Copied and adapted from https://github.com/akka/akka-http/issues/195
+/**
+  * A client robust to redirects and such. Copied and adapted from https://github.com/akka/akka-http/issues/195
+  *
+  * Usage: call httpClientWithRedirect().
+  */
+//noinspection ScalaDocMissingParameterDescription
 object RichHttpClient {
   type HttpClient = HttpRequest ⇒ Future[HttpResponse]
 
+  /**
+    * Given a response, follow a redirect - or just yield the response.
+    *
+    * @param client A function of the type HttpClient
+    * @param response
+    * @param materializer
+    * @return
+    */
+  // We'll use this function below in httpClientWithRedirect.
   def redirectOrResult(client: HttpClient)(response: HttpResponse)(implicit materializer: Materializer): Future[HttpResponse] =
     response.status match {
       case StatusCodes.Found | StatusCodes.MovedPermanently | StatusCodes.SeeOther ⇒
@@ -39,7 +70,16 @@ object RichHttpClient {
       case _ ⇒ Future.successful(response)
     }
 
+  /**
+    * Turns a  HttpClient into a Http client which handles redirects.
+    *
+    * @param client
+    * @param ec
+    * @param materializer
+    * @return a function of the type HttpClient
+    */
   def httpClientWithRedirect(client: HttpClient)(implicit ec: ExecutionContext, materializer: Materializer): HttpClient = {
+    // We are defining a function below!
     lazy val redirectingClient: HttpClient =
       req ⇒ client(req).flatMap(redirectOrResult(redirectingClient)) // recurse to support multiple redirects
 
