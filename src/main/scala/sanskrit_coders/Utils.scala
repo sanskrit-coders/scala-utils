@@ -41,7 +41,11 @@ object Utils {
   * Usage: call httpClientWithRedirect().
   *   private val simpleClient: HttpRequest => Future[HttpResponse] = Http(context.system).singleRequest(_: HttpRequest)
   *   private val redirectingClient: HttpRequest => Future[HttpResponse] = RichHttpClient.httpClientWithRedirect(simpleClient)
-  *
+  *   RichHttpClient.httpResponseToString(redirectingClient(HttpRequest(uri = uri))).map(responseString => {
+      log.debug(responseString)
+      val archiveItem = jsonHelper.fromString[ItemInfo](responseString)
+      archiveItem.toPodcast(filePattern = podcastRequest.filePattern, useArchiveOrder = podcastRequest.useArchiveOrder, podcast = podcastRequest.podcastTemplate)
+    })
   */
 //noinspection ScalaDocMissingParameterDescription
 object RichHttpClient {
