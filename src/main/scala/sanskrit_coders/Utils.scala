@@ -3,6 +3,8 @@ package sanskrit_coders
 import akka.http.scaladsl.model.headers.Location
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse, StatusCodes}
 import akka.stream.Materializer
+import akka.util.ByteString
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
@@ -37,9 +39,13 @@ object Utils {
   * A client robust to redirects and such. Copied and adapted from https://github.com/akka/akka-http/issues/195
   *
   * Usage: call httpClientWithRedirect().
+  *   private val simpleClient: HttpRequest => Future[HttpResponse] = Http(context.system).singleRequest(_: HttpRequest)
+  *   private val redirectingClient: HttpRequest => Future[HttpResponse] = RichHttpClient.httpClientWithRedirect(simpleClient)
+  *
   */
 //noinspection ScalaDocMissingParameterDescription
 object RichHttpClient {
+  private val log: Logger = LoggerFactory.getLogger(this.getClass)
   type HttpClient = HttpRequest ⇒ Future[HttpResponse]
 
   /**
@@ -85,4 +91,25 @@ object RichHttpClient {
 
     redirectingClient
   }
+
+  /**
+    * A convenience function to convert a Future[HttpResponse] to a Future[String]. There are potentially better ways of doing this using the akka stream API.
+    *
+    * @param responseFuture
+    * @return
+    */
+  def httpResponseToString(responseFuture: Future[HttpResponse]): Future[String] = {
+    responseFuture.flatMap {
+      case HttpResponse(StatusCodes.OK, headers, entity, _) =>
+        // The below is a Future[String] which is filled when the stream is read. That future is what we return!
+        entity.dataBytes.runFold(ByteString(""))(_ ++ _).map(_.utf8String)
+      case resp@HttpResponse(code, _, _, _) =>
+        val message = "Request for  failed, response code: " + code
+        log.warn(message)
+        // Always make sure you consume the response entity streams (of type Source[ByteString,Unit]) by for example connecting it to a Sink (for example response.discardEntityBytes() if you don’t care about the response entity), since otherwise Akka HTTP (and the underlying Streams infrastructure) will understand the lack of entity consumption as a back-pressure signal and stop reading from the underlying TCP connection!
+        resp.discardEntityBytes()
+        Future.failed(new Exception(message))
+    }
+  }
+
 }
