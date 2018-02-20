@@ -39,6 +39,8 @@ object Utils {
   * A client robust to redirects and such. Copied and adapted from https://github.com/akka/akka-http/issues/195
   *
   * Usage: call httpClientWithRedirect().
+  *   implicit val actorMaterializer = ActorMaterializer()
+  *   implicit val executionContext = system.dispatcher
   *   private val simpleClient: HttpRequest => Future[HttpResponse] = Http(context.system).singleRequest(_: HttpRequest)
   *   private val redirectingClient: HttpRequest => Future[HttpResponse] = RichHttpClient.httpClientWithRedirect(simpleClient)
   *   RichHttpClient.httpResponseToString(redirectingClient(HttpRequest(uri = uri))).map(responseString => {
@@ -102,7 +104,7 @@ object RichHttpClient {
     * @param responseFuture
     * @return
     */
-  def httpResponseToString(responseFuture: Future[HttpResponse]): Future[String] = {
+  def httpResponseToString(responseFuture: Future[HttpResponse])(implicit ec: ExecutionContext, materializer: Materializer): Future[String] = {
     responseFuture.flatMap {
       case HttpResponse(StatusCodes.OK, headers, entity, _) =>
         // The below is a Future[String] which is filled when the stream is read. That future is what we return!
