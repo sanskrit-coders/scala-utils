@@ -1,7 +1,7 @@
 name := "scala-utils"
 
-val akkaVersion = "2.5.4"
-val akkaHttpVersion = "10.0.10"
+val akkaVersion = "2.5.9"
+val akkaHttpVersion = "10.0.11"
 
 resolvers += Resolver.sonatypeRepo("releases")
 resolvers += Resolver.sonatypeRepo("snapshots")
