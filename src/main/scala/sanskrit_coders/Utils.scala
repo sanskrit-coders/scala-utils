@@ -48,6 +48,12 @@ object Utils {
       val archiveItem = jsonHelper.fromString[ItemInfo](responseString)
       archiveItem.toPodcast(filePattern = podcastRequest.filePattern, useArchiveOrder = podcastRequest.useArchiveOrder, podcast = podcastRequest.podcastTemplate)
     })
+
+
+  To dump to file:
+      val fileSink = FileIO.toPath(Paths.get(destinationPath))
+      redirectingClient(HttpRequest(uri = dictTarUrl)).map(_.entity.dataBytes.to(fileSink))
+
   */
 //noinspection ScalaDocMissingParameterDescription
 object RichHttpClient {
