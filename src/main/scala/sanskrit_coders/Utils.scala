@@ -51,8 +51,14 @@ object Utils {
 
 
   To dump to file:
-      val fileSink = FileIO.toPath(Paths.get(destinationPath))
-      redirectingClient(HttpRequest(uri = dictTarUrl)).map(_.entity.dataBytes.to(fileSink))
+      val httpResponseFuture = redirectingClient(HttpRequest(uri = dict.dictTarUrl))
+
+        val destinationPath = Paths.get(dict.destinationFolder,  dict.dictTarUrl.split("/").last)
+      assert(new java.io.File(dict.destinationFolder).mkdirs())
+      val fileSink = FileIO.toPath(destinationPath)
+      val ioResultFuture = httpResponseFuture.flatMap(response => {
+        response.entity.dataBytes.runWith(fileSink)
+      })
 
   */
 //noinspection ScalaDocMissingParameterDescription
