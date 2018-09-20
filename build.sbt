@@ -3,7 +3,7 @@ name := "scala-utils"
 scalaVersion := "2.12.6"
 
 // Ensure that the versions below are mutually compatible - else unexpected errors will happen.
-val akkaVersion = "2.5.7"
+val akkaVersion = "2.5.16"
 val akkaHttpVersion = "10.1.5"
 val scalactestVersion = "3.0.5"
 
