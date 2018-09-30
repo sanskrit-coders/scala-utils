@@ -124,6 +124,7 @@ object RichHttpClient {
       case resp@HttpResponse(code, headers, entity, protocol) =>
         val message = "Request failed, response code: " + code
         log.warn(message)
+        log.warn("Response: " + resp)
         log.warn("Headers: " + headers.mkString(","))
         log.warn("entity " + entity.toString)
         log.warn("protocol " + protocol.toString)
