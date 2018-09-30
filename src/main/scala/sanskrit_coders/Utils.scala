@@ -121,9 +121,12 @@ object RichHttpClient {
       case HttpResponse(StatusCodes.OK, headers, entity, _) =>
         // The below is a Future[String] which is filled when the stream is read. That future is what we return!
         entity.dataBytes.runFold(ByteString(""))(_ ++ _).map(_.utf8String)
-      case resp@HttpResponse(code, _, _, _) =>
-        val message = "Request for  failed, response code: " + code
+      case resp@HttpResponse(code, headers, entity, protocol) =>
+        val message = "Request failed, response code: " + code
         log.warn(message)
+        log.warn("Headers: " + headers.mkString(","))
+        log.warn("entity " + entity.toString)
+        log.warn("protocol " + protocol.toString)
         // Always make sure you consume the response entity streams (of type Source[ByteString,Unit]) by for example connecting it to a Sink (for example response.discardEntityBytes() if you don’t care about the response entity), since otherwise Akka HTTP (and the underlying Streams infrastructure) will understand the lack of entity consumption as a back-pressure signal and stop reading from the underlying TCP connection!
         resp.discardEntityBytes()
         Future.failed(new Exception(message))
