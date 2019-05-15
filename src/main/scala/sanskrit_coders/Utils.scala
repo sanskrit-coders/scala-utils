@@ -35,12 +35,12 @@ object Utils {
     }
   }
 
-  def runCommandLimitOutput(commandString: String, maxLines:Int=50): (StringBuilder, StringBuilder) = {
+  def runCommandLimitOutput(commandString: String, maxLines:Int=50): (Int, StringBuilder, StringBuilder) = {
     val stdout = new StringBuilder
     val stderr = new StringBuilder
     import scala.sys.process._
     val status = s"$commandString" ! ProcessLogger(appendToStringTillLimit(someStringBuilder=stdout, _, maxLines), appendToStringTillLimit(someStringBuilder=stderr, _, maxLines))
-    return Tuple2(stdout, stderr)
+    return Tuple3(status, stdout, stderr)
   }
   
 }
