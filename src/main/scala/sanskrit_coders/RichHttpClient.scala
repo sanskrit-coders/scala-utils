@@ -1,8 +1,9 @@
 package sanskrit_coders
 
+import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers.Location
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse, StatusCodes}
-import akka.stream.Materializer
+import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.ByteString
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -102,5 +103,4 @@ object RichHttpClient {
         Future.failed(new Exception(message))
     }
   }
-
 }
