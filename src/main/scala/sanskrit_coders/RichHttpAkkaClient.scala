@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
   * A client robust to redirects and such. Copied and adapted from https://github.com/akka/akka-http/issues/195
   *
   * Usage: call httpClientWithRedirect().
-  *   (Optional:) implicit val actorSystem = ActorSystem("xyz")
+  *   implicit val actorSystem = ActorSystem("xyz")
   *   private val redirectingClient: HttpRequest => Future[HttpResponse] = getClientWithAkkaSystem()
   *   RichHttpClient.httpResponseToString(redirectingClient(HttpRequest(uri = uri))).map(responseString => {log.debug(responseString)})
  *
@@ -25,7 +25,7 @@ object RichHttpAkkaClient {
   private val log: Logger = LoggerFactory.getLogger(this.getClass)
   type HttpClient = HttpRequest ⇒ Future[HttpResponse]
 
-  def getClientWithAkkaSystem()(implicit system: ActorSystem = ActorSystem("httpAkka")): HttpRequest => Future[HttpResponse] = {
+  def getClientWithAkkaSystem()(implicit system: ActorSystem ): HttpRequest => Future[HttpResponse] = {
     import scala.concurrent._
     implicit val ec: ExecutionContext = system.dispatcher
     implicit val actorMaterializer: ActorMaterializer = ActorMaterializer()
@@ -43,7 +43,7 @@ object RichHttpAkkaClient {
     * @return
     */
   // We'll use this function below in httpClientWithRedirect.
-  def redirectOrResult(client: HttpClient)(response: HttpResponse)(implicit system: ActorSystem = ActorSystem("httpAkka")): Future[HttpResponse] =
+  def redirectOrResult(client: HttpClient)(response: HttpResponse)(implicit system: ActorSystem ): Future[HttpResponse] =
     response.status match {
       case StatusCodes.Found | StatusCodes.MovedPermanently | StatusCodes.SeeOther ⇒
         val newUri = response.header[Location].get.uri
@@ -70,7 +70,7 @@ object RichHttpAkkaClient {
     * @param system
     * @return a recursive function of the type HttpClient
     */
-  def httpClientWithRedirect(client: HttpClient)(implicit system: ActorSystem = ActorSystem("httpAkka")): HttpClient = {
+  def httpClientWithRedirect(client: HttpClient)(implicit system: ActorSystem ): HttpClient = {
     // We are defining a function below!
     implicit val context: ExecutionContextExecutor = system.dispatcher
     lazy val redirectingClient: HttpClient =
@@ -85,7 +85,7 @@ object RichHttpAkkaClient {
     * @param responseFuture
     * @return
     */
-  def httpResponseToString(responseFuture: Future[HttpResponse])(implicit system: ActorSystem = ActorSystem("httpAkka")): Future[String] = {
+  def httpResponseToString(responseFuture: Future[HttpResponse])(implicit system: ActorSystem ): Future[String] = {
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val context: ExecutionContextExecutor = system.dispatcher
     responseFuture.flatMap {
@@ -101,7 +101,7 @@ object RichHttpAkkaClient {
     }
   }
 
-  def dumpToFile(uri: String, destinationPathStr:String)(implicit system: ActorSystem = ActorSystem("httpAkka")) = {
+  def dumpToFile(uri: String, destinationPathStr:String)(implicit system: ActorSystem ) = {
     val redirectingClient = getClientWithAkkaSystem()
     val httpResponseFuture = redirectingClient(HttpRequest(uri = uri))
     val destinationPath = new java.io.File(destinationPathStr)
