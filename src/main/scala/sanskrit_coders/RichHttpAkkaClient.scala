@@ -9,7 +9,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.ByteString
 import org.slf4j.{Logger, LoggerFactory}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
 /**
   * A client robust to redirects and such. Copied and adapted from https://github.com/akka/akka-http/issues/195
@@ -28,7 +28,7 @@ object RichHttpAkkaClient {
   def getClientWithAkkaSystem()(implicit system: ActorSystem = ActorSystem("httpAkka")): HttpRequest => Future[HttpResponse] = {
     import scala.concurrent._
     implicit val ec: ExecutionContext = system.dispatcher
-    implicit val actorMaterializer = ActorMaterializer()
+    implicit val actorMaterializer: ActorMaterializer = ActorMaterializer()
     val simpleClient: HttpRequest => Future[HttpResponse] = Http().singleRequest(_: HttpRequest)
     val redirectingClient: HttpRequest => Future[HttpResponse] = RichHttpAkkaClient.httpClientWithRedirect(simpleClient)
     redirectingClient
@@ -48,7 +48,7 @@ object RichHttpAkkaClient {
       case StatusCodes.Found | StatusCodes.MovedPermanently | StatusCodes.SeeOther ⇒
         val newUri = response.header[Location].get.uri
         // Always make sure you consume the response entity streams (of type Source[ByteString,Unit]) by for example connecting it to a Sink (for example response.discardEntityBytes() if you don’t care about the response entity), since otherwise Akka HTTP (and the underlying Streams infrastructure) will understand the lack of entity consumption as a back-pressure signal and stop reading from the underlying TCP connection!
-        implicit val materializer = ActorMaterializer()
+        implicit val materializer: ActorMaterializer = ActorMaterializer()
         response.discardEntityBytes()
         log.info(s"redirected to ${newUri.toString()}")
 
@@ -72,7 +72,7 @@ object RichHttpAkkaClient {
     */
   def httpClientWithRedirect(client: HttpClient)(implicit system: ActorSystem = ActorSystem("httpAkka")): HttpClient = {
     // We are defining a function below!
-    implicit val context = system.dispatcher
+    implicit val context: ExecutionContextExecutor = system.dispatcher
     lazy val redirectingClient: HttpClient =
       req ⇒ client(req).flatMap(redirectOrResult(redirectingClient)) // recurse to support multiple redirects
 
@@ -86,8 +86,8 @@ object RichHttpAkkaClient {
     * @return
     */
   def httpResponseToString(responseFuture: Future[HttpResponse])(implicit system: ActorSystem = ActorSystem("httpAkka")): Future[String] = {
-    implicit val materializer = ActorMaterializer()
-    implicit val context = system.dispatcher
+    implicit val materializer: ActorMaterializer = ActorMaterializer()
+    implicit val context: ExecutionContextExecutor = system.dispatcher
     responseFuture.flatMap {
       case HttpResponse(StatusCodes.OK, headers, entity, _) =>
         // The below is a Future[String] which is filled when the stream is read. That future is what we return!
