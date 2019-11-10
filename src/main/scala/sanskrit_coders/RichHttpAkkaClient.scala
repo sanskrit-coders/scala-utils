@@ -101,13 +101,14 @@ object RichHttpAkkaClient {
     }
   }
 
-  def dumpToFile(uri: String, destinationPath:String)(implicit system: ActorSystem = ActorSystem("httpAkka")) = {
+  def dumpToFile(uri: String, destinationPathStr:String)(implicit system: ActorSystem = ActorSystem("httpAkka")) = {
     val redirectingClient = getClientWithAkkaSystem()
     val httpResponseFuture = redirectingClient(HttpRequest(uri = uri))
-    assert(new java.io.File(destinationPath).getParentFile.mkdirs())
+    val destinationPath = new java.io.File(destinationPathStr)
+    assert(destinationPath.getParentFile.mkdirs())
     implicit val ec: ExecutionContext = system.dispatcher
     implicit val materializer = ActorMaterializer()
-    val fileSink = FileIO.toPath(destinationPath)
+    val fileSink = FileIO.toPath(destinationPath.toPath)
     val ioResultFuture = httpResponseFuture.flatMap(response => {
       response.entity.dataBytes.runWith(fileSink)
     })
