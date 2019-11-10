@@ -18,7 +18,7 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
   *   implicit val actorSystem = ActorSystem("xyz")
   *   private val redirectingClient: HttpRequest => Future[HttpResponse] = getClientWithAkkaSystem()
   *   RichHttpClient.httpResponseToString(redirectingClient(HttpRequest(uri = uri))).map(responseString => {log.debug(responseString)})
- *
+ *    actorSystem.terminate()
  */
 //noinspection ScalaDocMissingParameterDescription
 object RichHttpAkkaClient {
