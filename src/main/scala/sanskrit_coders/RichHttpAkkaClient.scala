@@ -105,7 +105,7 @@ object RichHttpAkkaClient {
     val redirectingClient = getClientWithAkkaSystem()
     val httpResponseFuture = redirectingClient(HttpRequest(uri = uri))
     val destinationPath = new java.io.File(destinationPathStr)
-    assert(destinationPath.getParentFile.mkdirs())
+    destinationPath.getParentFile.mkdirs()
     implicit val ec: ExecutionContext = system.dispatcher
     implicit val materializer = ActorMaterializer()
     val fileSink = FileIO.toPath(destinationPath.toPath)
