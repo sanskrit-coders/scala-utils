@@ -112,5 +112,6 @@ object RichHttpAkkaClient {
     val ioResultFuture = httpResponseFuture.flatMap(response => {
       response.entity.dataBytes.runWith(fileSink)
     })
+    ioResultFuture
   }
 }
