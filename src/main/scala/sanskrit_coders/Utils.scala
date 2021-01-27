@@ -47,8 +47,8 @@ object Utils {
     val stdout = new StringBuilder
     val stderr = new StringBuilder
     import scala.sys.process._
-    val status = commandSeq !! ProcessLogger(appendToStringTillLimit(someStringBuilder=stdout, _, maxLines), appendToStringTillLimit(someStringBuilder=stderr, _, maxLines))
-    return Tuple3(status, stdout, stderr)
+    val status = commandSeq lineStream_! ProcessLogger(appendToStringTillLimit(someStringBuilder=stdout, _, maxLines), appendToStringTillLimit(someStringBuilder=stderr, _, maxLines))
+    return Tuple3(status.toString(), stdout, stderr)
   }
 
   
