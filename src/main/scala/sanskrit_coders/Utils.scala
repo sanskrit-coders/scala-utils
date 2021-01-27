@@ -43,12 +43,12 @@ object Utils {
     return Tuple3(status, stdout, stderr)
   }
 
-  def runCommandSeqLimitOutput(commandSeq: Seq[String], maxLines:Int=50): (String, StringBuilder, StringBuilder) = {
+  def runCommandSeqLimitOutput(commandSeq: Seq[String], maxLines:Int=50): (Int, StringBuilder, StringBuilder) = {
     val stdout = new StringBuilder
     val stderr = new StringBuilder
     import scala.sys.process._
     val status = commandSeq ! ProcessLogger(appendToStringTillLimit(someStringBuilder=stdout, _, maxLines), appendToStringTillLimit(someStringBuilder=stderr, _, maxLines))
-    return Tuple3(status.toString(), stdout, stderr)
+    return Tuple3(status, stdout, stderr)
   }
 
   
