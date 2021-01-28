@@ -30,7 +30,7 @@ object Utils {
     Future.sequence(mapValuesToTrys(futures = futures))
 
   def appendToStringTillLimit(someStringBuilder: StringBuilder, newString: String, maxLines:Int=50) = {
-    if (someStringBuilder.size < 50) {
+    if (someStringBuilder.split('\n').size < maxLines) {
       someStringBuilder.append(newString)
     }
   }
