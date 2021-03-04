@@ -103,7 +103,7 @@ object RichHttpAkkaClient {
 
   def dumpToFile(uri: String, destinationPathStr:String)(implicit system: ActorSystem ): Future[IOResult] = {
     val redirectingClient = getClientWithAkkaSystem()
-    val httpResponseFuture = redirectingClient(HttpRequest(uri = uri))
+    val httpResponseFuture = redirectingClient(HttpRequest(uri = uri.trim))
     val destinationPath = new java.io.File(destinationPathStr)
     destinationPath.getParentFile.mkdirs()
     implicit val ec: ExecutionContext = system.dispatcher
