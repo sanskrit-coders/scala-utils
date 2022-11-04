@@ -1,11 +1,10 @@
 name := "scala-utils"
 
-scalaVersion := "2.12.8"
+scalaVersion := "2.13.10"
 
 // Ensure that the versions below are mutually compatible - else unexpected errors will happen.
-val akkaVersion = "2.5.16"
-val akkaHttpVersion = "10.1.5"
-val scalactestVersion = "3.0.5"
+val akkaVersion = "2.7.0"
+val akkaHttpVersion = "10.4.0"
 
 resolvers += Resolver.sonatypeRepo("releases")
 resolvers += Resolver.sonatypeRepo("snapshots")
@@ -16,15 +15,14 @@ libraryDependencies ++= Seq(
 //  ,"org.slf4j" % "slf4j-simple" % "1.7.25"
 
   // JSON processing.
-  ,"de.heikoseeberger" %% "akka-http-json4s" % "1.21.0"
-  ,"org.json4s" % "json4s-native_2.12" % "3.6.1"
+  ,"de.heikoseeberger" %% "akka-http-json4s" % "1.40.0-RC3"
+  ,"org.json4s" %% "json4s-native" % "4.1.0-M2"
 
   ,"com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion  // The Akka HTTP client.
 
 )
 
-libraryDependencies += "org.scalactic" %% "scalactic" % scalactestVersion
-libraryDependencies += "org.scalatest" %% "scalatest" % scalactestVersion % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % "test"
 
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
