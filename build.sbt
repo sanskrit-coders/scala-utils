@@ -26,20 +26,9 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % "test"
 
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
-scmInfo := Some(
-  ScmInfo(
-    url("https://github.com/sanskrit-coders/scala-utils"),
-    "scm:git@github.com:sanskrit-coders/scala-utils.git"
-  )
-)
 
 publishMavenStyle := true
-publishTo := Some(
-  if (isSnapshot.value)
-    Opts.resolver.sonatypeSnapshots
-  else
-    Opts.resolver.sonatypeStaging
-)
+publishTo := sonatypePublishToBundle.value
 
 import ReleaseTransformations._
 
