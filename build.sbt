@@ -33,7 +33,6 @@ scmInfo := Some(
   )
 )
 
-useGpg := true
 publishMavenStyle := true
 publishTo := Some(
   if (isSnapshot.value)
