@@ -6,8 +6,11 @@ scalaVersion := "2.13.10"
 val akkaVersion = "2.7.0"
 val akkaHttpVersion = "10.4.0"
 
-resolvers += Resolver.sonatypeRepo("releases")
-resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers +=
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+resolvers +=
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/releases"
+resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 libraryDependencies ++= Seq(
   // Logging
