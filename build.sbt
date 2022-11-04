@@ -12,6 +12,7 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 libraryDependencies ++= Seq(
   // Logging
   "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
+  , "com.typesafe.akka" %% "akka-stream" % akkaVersion
 //  ,"org.slf4j" % "slf4j-simple" % "1.7.25"
 
   // JSON processing.
@@ -19,7 +20,6 @@ libraryDependencies ++= Seq(
   ,"org.json4s" %% "json4s-native" % "4.1.0-M2"
 
   ,"com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion  // The Akka HTTP client.
-
 )
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % "test"
