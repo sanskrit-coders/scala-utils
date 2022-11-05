@@ -35,6 +35,7 @@ publishTo := sonatypePublishToBundle.value
 
 import ReleaseTransformations._
 
+// releaseCrossBuild := true // true if you cross-build the project for multiple Scala versions
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   inquireVersions,
@@ -43,10 +44,9 @@ releaseProcess := Seq[ReleaseStep](
   setReleaseVersion,
   commitReleaseVersion,
   tagRelease,
-  releaseStepCommand("sonatypeOpen \"com.github.sanskrit-coders\" \"staging_scala_utils\";"),
-  releaseStepCommand("publishSigned"),
+  releaseStepCommandAndRemaining("publishSigned"),
+  releaseStepCommand("sonatypeRelease"),
   setNextVersion,
   commitNextVersion,
-  releaseStepCommand("sonatypeRelease"),
   pushChanges
 )
