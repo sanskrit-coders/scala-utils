@@ -43,7 +43,7 @@ releaseProcess := Seq[ReleaseStep](
   setReleaseVersion,
   commitReleaseVersion,
   tagRelease,
-  releaseStepCommand("sonatypeOpen \"com.github.sanskrit-coders\" \"staging\";"),
+  releaseStepCommand("sonatypeOpen \"com.github.sanskrit-coders\" \"staging_scala_utils\";"),
   releaseStepCommand("publishSigned"),
   setNextVersion,
   commitNextVersion,
