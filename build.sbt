@@ -9,7 +9,7 @@ val akkaHttpVersion = "10.4.0"
 resolvers +=
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 resolvers +=
-  "Sonatype OSS Releasers" at "https://oss.sonatype.org/content/repositories/releases"
+  "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 libraryDependencies ++= Seq(
