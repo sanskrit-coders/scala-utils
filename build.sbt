@@ -1,7 +1,6 @@
 name := "scala-utils"
 
 scalaVersion := "2.13.10"
-ThisBuild / versionScheme := Some("strict")
 
 // Ensure that the versions below are mutually compatible - else unexpected errors will happen.
 val akkaVersion = "2.7.0"
