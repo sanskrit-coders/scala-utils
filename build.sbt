@@ -1,4 +1,6 @@
 name := "scala-utils"
+ThisBuild / versionScheme := Some("strict")
+
 
 scalaVersion := "2.13.10"
 
