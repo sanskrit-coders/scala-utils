@@ -1,5 +1,5 @@
 ## Intro
-General scal autils
+General scala utils
 
 ## Links to general comments
 See [indic-transliteration/README](https://github.com/sanskrit-coders/indic-transliteration/blob/master/README.md) for the following info:

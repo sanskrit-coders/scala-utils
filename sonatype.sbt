@@ -8,3 +8,5 @@ scmInfo := Some(
     "scm:git@github.com:sanskrit-coders/scala-utils.git"
   )
 )
+
+description := "General scala utils used in sanskrit-coders projects."
