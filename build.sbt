@@ -29,7 +29,10 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.14" % "test"
 
-resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
+
+assembly / assemblyOutputPath := file("bin/artifacts/scala-utils.jar")
+//assembly / mainClass := Some("stardict_sanskrit.commandInterface")
+
 
 
 publishMavenStyle := true
@@ -43,6 +46,7 @@ releaseProcess := Seq[ReleaseStep](
   inquireVersions,
   runClean,
   runTest,
+  releaseStepCommand("assembly"),
   setReleaseVersion,
   commitReleaseVersion,
   tagRelease,
