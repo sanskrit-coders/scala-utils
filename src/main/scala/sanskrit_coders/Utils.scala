@@ -1,8 +1,6 @@
 package sanskrit_coders
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.sys.process.ProcessLogger
-import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
 
 //noinspection ScalaDocMissingParameterDescription

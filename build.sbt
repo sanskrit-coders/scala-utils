@@ -20,10 +20,6 @@ libraryDependencies ++= Seq(
   , "com.typesafe.akka" %% "akka-stream" % akkaVersion
 //  ,"org.slf4j" % "slf4j-simple" % "1.7.25"
 
-  // JSON processing.
-  ,"de.heikoseeberger" %% "akka-http-json4s" % "1.40.0-RC3"
-  ,"org.json4s" %% "json4s-native" % "4.1.0-M2"
-
   ,"com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion  // The Akka HTTP client.
 )
 
