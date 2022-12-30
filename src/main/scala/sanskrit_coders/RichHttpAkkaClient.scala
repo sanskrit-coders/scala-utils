@@ -4,8 +4,8 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers.Location
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse, StatusCodes}
+import akka.stream.IOResult
 import akka.stream.scaladsl.FileIO
-import akka.stream.{ActorMaterializer, IOResult, Materializer}
 import akka.util.ByteString
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -28,7 +28,6 @@ object RichHttpAkkaClient {
   def getClientWithAkkaSystem()(implicit system: ActorSystem ): HttpRequest => Future[HttpResponse] = {
     import scala.concurrent._
     implicit val ec: ExecutionContext = system.dispatcher
-    implicit val actorMaterializer: ActorMaterializer = ActorMaterializer()
     val simpleClient: HttpRequest => Future[HttpResponse] = Http().singleRequest(_: HttpRequest)
     val redirectingClient: HttpRequest => Future[HttpResponse] = RichHttpAkkaClient.httpClientWithRedirect(simpleClient)
     redirectingClient
@@ -48,7 +47,6 @@ object RichHttpAkkaClient {
       case StatusCodes.Found | StatusCodes.MovedPermanently | StatusCodes.SeeOther | StatusCodes.TemporaryRedirect| StatusCodes.PermanentRedirect ⇒
         val newUri = response.header[Location].get.uri
         // Always make sure you consume the response entity streams (of type Source[ByteString,Unit]) by for example connecting it to a Sink (for example response.discardEntityBytes() if you don’t care about the response entity), since otherwise Akka HTTP (and the underlying Streams infrastructure) will understand the lack of entity consumption as a back-pressure signal and stop reading from the underlying TCP connection!
-        implicit val materializer: ActorMaterializer = ActorMaterializer()
         response.discardEntityBytes()
         log.info(s"redirected to ${newUri.toString()}")
 
@@ -58,7 +56,7 @@ object RichHttpAkkaClient {
         //       or authentication headers?
         client(HttpRequest(method = HttpMethods.GET, uri = newUri))
       // TODO: what to do on an error? Also report the original request/response?
-      case StatusCodes.InternalServerError | StatusCodes.BadRequest | StatusCodes.Unauthorized| StatusCodes.PaymentRequired| StatusCodes.Forbidden| StatusCodes.NotFound| StatusCodes.MethodNotAllowed| StatusCodes.ProxyAuthenticationRequired| StatusCodes.RequestTimeout| StatusCodes.Conflict| StatusCodes.Gone| StatusCodes.PreconditionFailed| StatusCodes.RequestEntityTooLarge| StatusCodes.RequestUriTooLong| StatusCodes.EnhanceYourCalm| StatusCodes.Locked| StatusCodes.UpgradeRequired| StatusCodes.TooManyRequests| StatusCodes.RequestHeaderFieldsTooLarge| StatusCodes.BlockedByParentalControls| StatusCodes.RetryWith| StatusCodes.NotImplemented| StatusCodes.BadGateway| StatusCodes.ServiceUnavailable| StatusCodes.GatewayTimeout| StatusCodes.HTTPVersionNotSupported| StatusCodes.VariantAlsoNegotiates| StatusCodes.InsufficientStorage| StatusCodes.LoopDetected| StatusCodes.BandwidthLimitExceeded| StatusCodes.NetworkAuthenticationRequired| StatusCodes.NetworkReadTimeout| StatusCodes.NetworkConnectTimeout=> Future.failed(new Exception(response.status.defaultMessage))  
+      case StatusCodes.InternalServerError | StatusCodes.BadRequest | StatusCodes.Unauthorized| StatusCodes.PaymentRequired| StatusCodes.Forbidden| StatusCodes.NotFound| StatusCodes.MethodNotAllowed| StatusCodes.ProxyAuthenticationRequired| StatusCodes.RequestTimeout| StatusCodes.Conflict| StatusCodes.Gone| StatusCodes.PreconditionFailed| StatusCodes.ContentTooLarge| StatusCodes.UriTooLong| StatusCodes.EnhanceYourCalm| StatusCodes.Locked| StatusCodes.UpgradeRequired| StatusCodes.TooManyRequests| StatusCodes.RequestHeaderFieldsTooLarge| StatusCodes.BlockedByParentalControls| StatusCodes.RetryWith| StatusCodes.NotImplemented| StatusCodes.BadGateway| StatusCodes.ServiceUnavailable| StatusCodes.GatewayTimeout| StatusCodes.HttpVersionNotSupported| StatusCodes.VariantAlsoNegotiates| StatusCodes.InsufficientStorage| StatusCodes.LoopDetected| StatusCodes.BandwidthLimitExceeded| StatusCodes.NetworkAuthenticationRequired| StatusCodes.NetworkReadTimeout| StatusCodes.NetworkConnectTimeout=> Future.failed(new Exception(response.status.defaultMessage))  
       // TODO: also handle 307 | StatusCodes.Unauthorized, which would require resending POST requests
       case _ ⇒ Future.successful(response)
     }
@@ -86,7 +84,6 @@ object RichHttpAkkaClient {
     * @return
     */
   def httpResponseToString(responseFuture: Future[HttpResponse])(implicit system: ActorSystem ): Future[String] = {
-    implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val context: ExecutionContextExecutor = system.dispatcher
     responseFuture.flatMap {
       case HttpResponse(StatusCodes.OK, headers, entity, _) =>
@@ -107,7 +104,6 @@ object RichHttpAkkaClient {
     val destinationPath = new java.io.File(destinationPathStr)
     destinationPath.getParentFile.mkdirs()
     implicit val ec: ExecutionContext = system.dispatcher
-    implicit val materializer: ActorMaterializer = ActorMaterializer()
     val fileSink = FileIO.toPath(destinationPath.toPath)
     val ioResultFuture = httpResponseFuture.flatMap(response => {
       response.entity.dataBytes.runWith(fileSink)
